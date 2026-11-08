@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lua Raw Generator</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:16px;
+ background:#080d0a;color:#eaffef;
+ font-family:Arial,sans-serif;
+}
+.container{max-width:550px;margin:auto}
+header{text-align:center;padding:20px 0}
+h1{color:#42e88a;font-size:24px;margin:5px}
+.sub{color:#819b89;font-size:12px}
+.card{
+ background:#101a13;border:1px solid #23432d;
+ border-radius:13px;padding:15px;margin-bottom:14px;
+}
+h3{font-size:14px;color:#62ec9c;margin:0 0 12px}
+input,textarea{
+ width:100%;padding:12px;margin:6px 0;
+ background:#080f0b;border:1px solid #294b35;
+ border-radius:8px;color:white;outline:none;
+ font-size:13px;
+}
+textarea{
+ height:180px;resize:vertical;
+ font-family:monospace;line-height:1.5;
+}
+button{
+ border:0;border-radius:8px;padding:12px;
+ background:#176c3b;color:white;
+ font-weight:bold;font-size:12px;
+ cursor:pointer;
+}
+button:disabled{opacity:.45}
+button.secondary{background:#25382b}
+button.danger{background:#713333}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions button{flex:1;min-width:90px}
+.status{
+ padding:10px;border-radius:8px;
+ background:#0a140d;color:#9ceab6;
+ font-size:12px;word-break:break-word;
+ margin-top:10px;
+}
+.result{
+ word-break:break-all;
+ background:#080f0b;padding:12px;
+ border-radius:8px;font-size:12px;
+ color:#76eaa1;margin:8px 0;
+}
+.small{font-size:11px;color:#82988a}
+.hidden{display:none}
+.history-item{
+ border-top:1px solid #29402f;
+ padding:10px 0;font-size:12px;
+ word-break:break-all;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+<h1> LUA RAW GENERATOR </h1>
+<div class="sub">Supabase Storage • Mobile Edition</div>
+</header>
+
+<!-- AUTH -->
+<div class="card" id="authCard">
+<h3>ACCOUNT SUPABASE</h3>
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<div class="actions">
+<button onclick="register()">REGISTER</button>
+<button onclick="login()">LOGIN</button>
+</div>
+<div class="status" id="authStatus">Silakan login atau register.</div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+<div class="card">
+<h3>ACCOUNT</h3>
+<div id="userInfo" class="small"></div>
+<button class="secondary" onclick="logout()" style="margin-top:10px">
+LOGOUT
+</button>
+</div>
+
+<div class="card">
+<h3>01. SCRIPT LUA</h3>
+<input id="filename" value="script.lua"
+placeholder="Nama file">
+
+<textarea id="script"
+placeholder="Paste script Lua panjang di sini..."></textarea>
+
+<div class="actions">
+<button onclick="uploadScript()" id="uploadBtn">
+UPLOAD & CONVERT
+</button>
+<button class="secondary" onclick="clearAll()">
+CLEAR
+</button>
+</div>
+
+<div class="status" id="status">
+Menunggu script...
+</div>
+</div>
+
+<div class="card">
+<h3>02. RAW URL</h3>
+<div class="result" id="rawResult">
+URL akan muncul setelah upload.
+</div>
+<button class="secondary" onclick="copyRaw()">
+COPY RAW URL
+</button>
+</div>
+
+<div class="card">
+<h3>03. LOADSTRING</h3>
+<div class="result" id="loadResult">
+Loadstring akan muncul di sini.
+</div>
+<button onclick="copyLoad()">
+COPY LOADSTRING
+</button>
+</div>
+
+<div class="card">
+<h3>04. RIWAYAT UPLOAD</h3>
+<div id="history" class="small">
+Belum ada upload.
+</div>
+</div>
+
+</div>
+
+<footer class="small" style="text-align:center;padding:20px">
+LUA RAW GENERATOR V1 • SUPABASE STORAGE
+</footer>
+</div>
+
+<script>
+const SUPABASE_URL =
+"https://upkaakinhknykjjhhlcv.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_ir_zRGtYectARdKO7varZg_s2o5Zq-3";
+
+const BUCKET = "lua-scripts";
+
+const client = window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+let currentUser = null;
+let rawURL = "";
+let loadString = "";
+let historyList = [];
+
+const $ = id => document.getElementById(id);
+
+function message(id,text){
+ $(id).textContent = text;
+}
+
+function setApp(user){
+ currentUser = user;
+
+ $("authCard").classList.toggle("hidden",!!user);
+ $("app").classList.toggle("hidden",!user);
+
+ if(user){
+  message("userInfo","Login sebagai: "+user.email);
+ }
+}
+
+async function register(){
+ const email = $("email").value.trim();
+ const password = $("password").value;
+
+ if(!email || password.length < 6){
+  return message("authStatus",
+   "Masukkan email dan password minimal 6 karakter.");
+ }
+
+ message("authStatus","Mendaftarkan akun...");
+
+ const {data,error} = await client.auth.signUp({
+  email,password
+ });
+
+ if(error){
+  return message("authStatus",error.message);
+ }
+
+ if(data.session){
+  setApp(data.user);
+  message("status","Registrasi berhasil!");
+ }else{
+  message("authStatus",
+   "Pendaftaran berhasil. Periksa email untuk konfirmasi, jika diminta.");
+ }
+}
+
+async function login(){
+ const email = $("email").value.trim();
+ const password = $("password").value;
+
+ if(!email || !password){
+  return message("authStatus","Isi email dan password.");
+ }
+
+ message("authStatus","Sedang login...");
+
+ const {data,error} =
+ await client.auth.signInWithPassword({
+  email,password
+ });
+
+ if(error){
+  return message("authStatus",error.message);
+ }
+
+ setApp(data.user);
+ message("status","Login berhasil!");
+}
+
+async function logout(){
+ await client.auth.signOut();
+ setApp(null);
+}
+
+async function uploadScript(){
+ if(!currentUser){
+  return message("status","Silakan login dahulu.");
+ }
+
+ const source = $("script").value;
+
+ if(!source.trim()){
+  return message("status","Script masih kosong!");
+ }
+
+ let filename = $("filename").value.trim();
+
+ if(!filename){
+  filename = "script.lua";
+ }
+
+ filename = filename
+  .replace(/[^a-zA-Z0-9._-]/g,"_");
+
+ if(!filename.toLowerCase().endsWith(".lua")){
+  filename += ".lua";
+ }
+
+ const uniqueName =
+ Date.now() + "_" + filename;
+
+ const path = currentUser.id + "/" + uniqueName;
+
+ $("uploadBtn").disabled = true;
+ message("status","Mengupload script ke Supabase...");
+
+ try{
+  const {data,error} = await client.storage
+   .from(BUCKET)
+   .upload(path, new Blob([source],{
+    type:"text/plain;charset=utf-8"
+   }),{
+    contentType:"text/plain",
+    upsert:false
+   });
+
+  if(error) throw error;
+
+  const {data:publicData} = client.storage
+   .from(BUCKET)
+   .getPublicUrl(data.path);
+
+  rawURL = publicData.publicUrl;
+
+  loadString =
+   "loadstring(game:HttpGet(" +
+   JSON.stringify(rawURL) + "))()";
+
+  message("rawResult",rawURL);
+  message("loadResult",loadString);
+  message("status","Upload berhasil!");
+
+  historyList.unshift({
+   name:filename,
+   url:rawURL
+  });
+
+  renderHistory();
+
+ }catch(error){
+  message("status","Gagal: "+error.message);
+ }finally{
+  $("uploadBtn").disabled = false;
+ }
+}
+
+function renderHistory(){
+ $("history").innerHTML = "";
+
+ historyList.forEach(item=>{
+  const div = document.createElement("div");
+  div.className = "history-item";
+
+  const title = document.createElement("b");
+  title.textContent = item.name;
+
+  const url = document.createElement("div");
+  url.textContent = item.url;
+  url.style.color = "#70dc98";
+
+  div.append(title,url);
+  $("history").appendChild(div);
+ });
+}
+
+async function copyText(value){
+ if(!value){
+  return message("status","Belum ada hasil untuk dicopy.");
+ }
+
+ try{
+  await navigator.clipboard.writeText(value);
+  message("status","Berhasil dicopy!");
+ }catch(e){
+  message("status","Clipboard tidak tersedia di browser ini.");
+ }
+}
+
+function copyRaw(){
+ copyText(rawURL);
+}
+
+function copyLoad(){
+ copyText(loadString);
+}
+
+function clearAll(){
+ $("script").value = "";
+ $("filename").value = "script.lua";
+ rawURL = "";
+ loadString = "";
+ message("rawResult","URL akan muncul setelah upload.");
+ message("loadResult","Loadstring akan muncul di sini.");
+ message("status","Input dan hasil dibersihkan.");
+}
+
+client.auth.onAuthStateChange((event,session)=>{
+ setApp(session?.user || null);
+});
+
+async function init(){
+ const {data} = await client.auth.getSession();
+ setApp(data.session?.user || null);
+}
+
+init();
+</script>
+</body>
+</html>
