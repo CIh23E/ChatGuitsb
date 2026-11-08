@@ -1,67 +1,69 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lua Raw Generator</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lua Raw Manager V2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;padding:16px;
- background:#080d0a;color:#eaffef;
- font-family:Arial,sans-serif;
+ margin:0;padding:14px;background:#080d0a;color:#eaffef;
+ font-family:Arial,sans-serif
 }
-.container{max-width:550px;margin:auto}
-header{text-align:center;padding:20px 0}
-h1{color:#42e88a;font-size:24px;margin:5px}
+.container{max-width:600px;margin:auto}
+header{text-align:center;padding:18px 0}
+h1{color:#42e88a;font-size:23px;margin:5px}
 .sub{color:#819b89;font-size:12px}
 .card{
  background:#101a13;border:1px solid #23432d;
- border-radius:13px;padding:15px;margin-bottom:14px;
+ border-radius:13px;padding:14px;margin-bottom:13px
 }
 h3{font-size:14px;color:#62ec9c;margin:0 0 12px}
-input,textarea{
- width:100%;padding:12px;margin:6px 0;
+input,textarea,select{
+ width:100%;padding:12px;margin:5px 0;
  background:#080f0b;border:1px solid #294b35;
- border-radius:8px;color:white;outline:none;
- font-size:13px;
+ border-radius:8px;color:white;outline:none;font-size:13px
 }
 textarea{
- height:180px;resize:vertical;
- font-family:monospace;line-height:1.5;
+ height:190px;resize:vertical;
+ font-family:monospace;line-height:1.5
 }
 button{
- border:0;border-radius:8px;padding:12px;
- background:#176c3b;color:white;
- font-weight:bold;font-size:12px;
- cursor:pointer;
+ border:0;border-radius:8px;padding:11px;
+ background:#176c3b;color:white;font-weight:bold;
+ font-size:12px;cursor:pointer
 }
 button:disabled{opacity:.45}
 button.secondary{background:#25382b}
 button.danger{background:#713333}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
+button.blue{background:#244c70}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}
 .actions button{flex:1;min-width:90px}
 .status{
- padding:10px;border-radius:8px;
- background:#0a140d;color:#9ceab6;
- font-size:12px;word-break:break-word;
- margin-top:10px;
+ padding:10px;border-radius:8px;background:#0a140d;
+ color:#9ceab6;font-size:12px;word-break:break-word;
+ margin-top:10px
 }
 .result{
- word-break:break-all;
- background:#080f0b;padding:12px;
- border-radius:8px;font-size:12px;
- color:#76eaa1;margin:8px 0;
+ word-break:break-all;background:#080f0b;padding:11px;
+ border-radius:8px;font-size:12px;color:#76eaa1;margin:8px 0
 }
 .small{font-size:11px;color:#82988a}
-.hidden{display:none}
-.history-item{
- border-top:1px solid #29402f;
- padding:10px 0;font-size:12px;
- word-break:break-all;
+.hidden{display:none!important}
+.item{
+ border-top:1px solid #29402f;padding:11px 0;
+ font-size:12px;word-break:break-word
 }
+.item-title{font-weight:bold;color:#c8f7d6;font-size:13px}
+.item-meta{color:#82988a;margin:5px 0}
+.tag{
+ display:inline-block;background:#1b3925;color:#83e9a6;
+ border-radius:5px;padding:4px 7px;font-size:10px
+}
+hr{border:0;border-top:1px solid #29402f;margin:12px 0}
 </style>
 </head>
 
@@ -69,8 +71,8 @@ button.danger{background:#713333}
 <div class="container">
 
 <header>
-<h1> LUA RAW GENERATOR </h1>
-<div class="sub">Supabase Storage • Mobile Edition</div>
+<h1> LUA RAW MANAGER V2 </h1>
+<div class="sub">Folders • Edit Raw • Short URL • Supabase</div>
 </header>
 
 <!-- AUTH -->
@@ -91,64 +93,77 @@ button.danger{background:#713333}
 <div class="card">
 <h3>ACCOUNT</h3>
 <div id="userInfo" class="small"></div>
-<button class="secondary" onclick="logout()" style="margin-top:10px">
-LOGOUT
-</button>
+<div class="actions">
+<button class="secondary" onclick="logout()">LOGOUT</button>
+</div>
 </div>
 
+<!-- FOLDER MANAGER -->
 <div class="card">
-<h3>01. SCRIPT LUA</h3>
-<input id="filename" value="script.lua"
-placeholder="Nama file">
+<h3>01. FOLDER MANAGER</h3>
+<input id="folderName" placeholder="Nama folder baru">
+<div class="actions">
+<button onclick="createFolder()">+ BUAT FOLDER</button>
+</div>
 
-<textarea id="script"
-placeholder="Paste script Lua panjang di sini..."></textarea>
+<hr>
+<div id="folderList" class="small">Memuat folder...</div>
+</div>
+
+<!-- SCRIPT EDITOR -->
+<div class="card">
+<h3>02. SCRIPT EDITOR</h3>
+
+<div class="small" id="editorMode">Mode: Script baru</div>
+
+<input id="scriptTitle" placeholder="Nama script">
+<select id="folderSelect">
+<option value="">Tanpa folder</option>
+</select>
+
+<textarea id="scriptCode"
+placeholder="Paste kode Lua milikmu di sini..."></textarea>
 
 <div class="actions">
-<button onclick="uploadScript()" id="uploadBtn">
-UPLOAD & CONVERT
-</button>
-<button class="secondary" onclick="clearAll()">
-CLEAR
-</button>
+<button onclick="saveScript()" id="saveBtn">UPLOAD SCRIPT</button>
+<button class="secondary" onclick="resetEditor()">CLEAR</button>
 </div>
 
-<div class="status" id="status">
-Menunggu script...
-</div>
+<div class="status" id="status">Siap digunakan.</div>
 </div>
 
+<!-- URL -->
 <div class="card">
-<h3>02. RAW URL</h3>
-<div class="result" id="rawResult">
-URL akan muncul setelah upload.
-</div>
-<button class="secondary" onclick="copyRaw()">
-COPY RAW URL
-</button>
+<h3>03. SHORT RAW URL</h3>
+<div class="result" id="rawResult">URL muncul setelah script disimpan.</div>
+<button class="secondary" onclick="copyRaw()">COPY RAW URL</button>
 </div>
 
+<!-- LOADSTRING -->
 <div class="card">
-<h3>03. LOADSTRING</h3>
-<div class="result" id="loadResult">
-Loadstring akan muncul di sini.
+<h3>04. LOADSTRING</h3>
+<div class="result" id="loadResult">Loadstring muncul setelah script disimpan.</div>
+<button onclick="copyLoad()">COPY LOADSTRING</button>
+<div class="small" style="margin-top:8px">
+Catatan: Loadstring bukan API standar Roblox Studio. Gunakan hanya pada lingkungan yang kamu miliki atau punya izin untuk menguji.
 </div>
-<button onclick="copyLoad()">
-COPY LOADSTRING
-</button>
 </div>
 
+<!-- SCRIPT LIST -->
 <div class="card">
-<h3>04. RIWAYAT UPLOAD</h3>
-<div id="history" class="small">
-Belum ada upload.
-</div>
+<h3>05. SCRIPT MANAGER</h3>
+<input id="searchInput" placeholder="Cari nama script..." oninput="renderScripts()">
+<select id="filterFolder" onchange="renderScripts()">
+<option value="all">Semua folder</option>
+<option value="none">Tanpa folder</option>
+</select>
+<div id="scriptList" class="small">Memuat script...</div>
 </div>
 
 </div>
 
 <footer class="small" style="text-align:center;padding:20px">
-LUA RAW GENERATOR V1 • SUPABASE STORAGE
+LUA RAW MANAGER V2 • SUPABASE
 </footer>
 </div>
 
@@ -161,15 +176,20 @@ const SUPABASE_KEY =
 
 const BUCKET = "lua-scripts";
 
+const RAW_ENDPOINT =
+SUPABASE_URL + "/functions/v1/raw/";
+
 const client = window.supabase.createClient(
  SUPABASE_URL,
  SUPABASE_KEY
 );
 
 let currentUser = null;
+let folders = [];
+let scripts = [];
+let editingScript = null;
 let rawURL = "";
 let loadString = "";
-let historyList = [];
 
 const $ = id => document.getElementById(id);
 
@@ -188,19 +208,28 @@ function setApp(user){
  }
 }
 
+function safeSlug(){
+ return crypto.randomUUID().replace(/-/g,"");
+}
+
+/* AUTH */
+
 async function register(){
  const email = $("email").value.trim();
  const password = $("password").value;
 
  if(!email || password.length < 6){
   return message("authStatus",
-   "Masukkan email dan password minimal 6 karakter.");
+   "Isi email dan password minimal 6 karakter.");
  }
 
  message("authStatus","Mendaftarkan akun...");
 
  const {data,error} = await client.auth.signUp({
-  email,password
+  email,password,
+  options:{
+   emailRedirectTo:"https://cih23e.github.io/ChatGuitsb/"
+  }
  });
 
  if(error){
@@ -209,10 +238,11 @@ async function register(){
 
  if(data.session){
   setApp(data.user);
+  await loadAll();
   message("status","Registrasi berhasil!");
  }else{
   message("authStatus",
-   "Pendaftaran berhasil. Periksa email untuk konfirmasi, jika diminta.");
+   "Pendaftaran berhasil. Periksa email untuk konfirmasi jika diminta.");
  }
 }
 
@@ -226,8 +256,7 @@ async function login(){
 
  message("authStatus","Sedang login...");
 
- const {data,error} =
- await client.auth.signInWithPassword({
+ const {data,error} = await client.auth.signInWithPassword({
   email,password
  });
 
@@ -236,104 +265,494 @@ async function login(){
  }
 
  setApp(data.user);
+ await loadAll();
  message("status","Login berhasil!");
 }
 
 async function logout(){
  await client.auth.signOut();
  setApp(null);
+ folders = [];
+ scripts = [];
+ editingScript = null;
 }
 
-async function uploadScript(){
+/* LOAD DATA */
+
+async function loadAll(){
+ if(!currentUser) return;
+
+ await loadFolders();
+ await loadScripts();
+}
+
+async function loadFolders(){
+ const {data,error} = await client
+  .from("lua_folders")
+  .select("*")
+  .order("created_at",{ascending:false});
+
+ if(error){
+  message("status","Gagal memuat folder: "+error.message);
+  return;
+ }
+
+ folders = data || [];
+ renderFolders();
+ updateFolderSelects();
+}
+
+async function loadScripts(){
+ const {data,error} = await client
+  .from("lua_scripts")
+  .select("*")
+  .order("updated_at",{ascending:false});
+
+ if(error){
+  message("status","Gagal memuat script: "+error.message);
+  return;
+ }
+
+ scripts = data || [];
+ renderScripts();
+}
+
+/* FOLDER */
+
+async function createFolder(){
+ const name = $("folderName").value.trim();
+
+ if(!name){
+  return message("status","Masukkan nama folder.");
+ }
+
+ const {error} = await client
+  .from("lua_folders")
+  .insert({
+   user_id:currentUser.id,
+   name:name
+  });
+
+ if(error){
+  return message("status","Gagal membuat folder: "+error.message);
+ }
+
+ $("folderName").value = "";
+ await loadFolders();
+ message("status","Folder berhasil dibuat!");
+}
+
+async function renameFolder(id){
+ const folder = folders.find(x=>x.id===id);
+ if(!folder) return;
+
+ const newName = prompt("Nama folder baru:",folder.name);
+ if(newName === null) return;
+
+ if(!newName.trim()){
+  return alert("Nama folder tidak boleh kosong.");
+ }
+
+ const {error} = await client
+  .from("lua_folders")
+  .update({name:newName.trim()})
+  .eq("id",id);
+
+ if(error){
+  return message("status","Gagal rename: "+error.message);
+ }
+
+ await loadFolders();
+ message("status","Folder berhasil diubah.");
+}
+
+async function deleteFolder(id){
+ const folder = folders.find(x=>x.id===id);
+ if(!folder) return;
+
+ const count = scripts.filter(x=>x.folder_id===id).length;
+
+ if(count > 0){
+  return alert("Folder masih berisi script. Pindahkan atau hapus script terlebih dahulu.");
+ }
+
+ if(!confirm("Hapus folder "+folder.name+"?")) return;
+
+ const {error} = await client
+  .from("lua_folders")
+  .delete()
+  .eq("id",id);
+
+ if(error){
+  return message("status","Gagal menghapus folder: "+error.message);
+ }
+
+ await loadFolders();
+ message("status","Folder berhasil dihapus.");
+}
+
+function renderFolders(){
+ const box = $("folderList");
+ box.innerHTML = "";
+
+ if(!folders.length){
+  box.textContent = "Belum ada folder.";
+  return;
+ }
+
+ folders.forEach(folder=>{
+  const row = document.createElement("div");
+  row.className = "item";
+
+  const title = document.createElement("div");
+  title.className = "item-title";
+  title.textContent = "📁 "+folder.name;
+
+  const count = document.createElement("div");
+  count.className = "item-meta";
+  count.textContent =
+   scripts.filter(x=>x.folder_id===folder.id).length+" script";
+
+  const actions = document.createElement("div");
+  actions.className = "actions";
+
+  const rename = document.createElement("button");
+  rename.className = "secondary";
+  rename.textContent = "RENAME";
+  rename.onclick = ()=>renameFolder(folder.id);
+
+  const del = document.createElement("button");
+  del.className = "danger";
+  del.textContent = "DELETE";
+  del.onclick = ()=>deleteFolder(folder.id);
+
+  actions.append(rename,del);
+  row.append(title,count,actions);
+  box.append(row);
+ });
+}
+
+function updateFolderSelects(){
+ const editor = $("folderSelect");
+ const filter = $("filterFolder");
+
+ editor.innerHTML = '<option value="">Tanpa folder</option>';
+ filter.innerHTML =
+  '<option value="all">Semua folder</option>'+
+  '<option value="none">Tanpa folder</option>';
+
+ folders.forEach(folder=>{
+  const a = document.createElement("option");
+  a.value = folder.id;
+  a.textContent = folder.name;
+  editor.append(a);
+
+  const b = document.createElement("option");
+  b.value = folder.id;
+  b.textContent = folder.name;
+  filter.append(b);
+ });
+}
+
+/* SCRIPT SAVE / EDIT */
+
+async function saveScript(){
  if(!currentUser){
   return message("status","Silakan login dahulu.");
  }
 
- const source = $("script").value;
+ const source = $("scriptCode").value;
+ let title = $("scriptTitle").value.trim();
 
  if(!source.trim()){
-  return message("status","Script masih kosong!");
+  return message("status","Kode Lua masih kosong.");
  }
 
- let filename = $("filename").value.trim();
+ if(!title) title = "script.lua";
 
- if(!filename){
-  filename = "script.lua";
- }
+ const folderId = $("folderSelect").value || null;
 
- filename = filename
-  .replace(/[^a-zA-Z0-9._-]/g,"_");
-
- if(!filename.toLowerCase().endsWith(".lua")){
-  filename += ".lua";
- }
-
- const uniqueName =
- Date.now() + "_" + filename;
-
- const path = currentUser.id + "/" + uniqueName;
-
- $("uploadBtn").disabled = true;
- message("status","Mengupload script ke Supabase...");
+ $("saveBtn").disabled = true;
 
  try{
-  const {data,error} = await client.storage
-   .from(BUCKET)
-   .upload(path, new Blob([source],{
-    type:"text/plain;charset=utf-8"
-   }),{
-    contentType:"text/plain",
-    upsert:false
-   });
+  if(editingScript){
+   message("status","Menyimpan perubahan script...");
 
-  if(error) throw error;
+   const {error:uploadError} = await client.storage
+    .from(BUCKET)
+    .upload(
+     editingScript.storage_path,
+     new Blob([source],{type:"text/plain;charset=utf-8"}),
+     {
+      contentType:"text/plain",
+      upsert:true
+     }
+    );
 
-  const {data:publicData} = client.storage
-   .from(BUCKET)
-   .getPublicUrl(data.path);
+   if(uploadError) throw uploadError;
 
-  rawURL = publicData.publicUrl;
+   const {error:updateError} = await client
+    .from("lua_scripts")
+    .update({
+     title:title,
+     folder_id:folderId,
+     updated_at:new Date().toISOString()
+    })
+    .eq("id",editingScript.id);
 
-  loadString =
-   "loadstring(game:HttpGet(" +
-   JSON.stringify(rawURL) + "))()";
+   if(updateError) throw updateError;
+
+   rawURL = RAW_ENDPOINT + editingScript.slug;
+   loadString =
+    "loadstring(game:HttpGet("+
+    JSON.stringify(rawURL)+"))()";
+
+   message("status","Script berhasil diedit! URL tetap sama.");
+  }else{
+   message("status","Mengupload script baru...");
+
+   const slug = safeSlug();
+   const storagePath =
+    currentUser.id+"/"+slug+".lua";
+
+   const {error:uploadError} = await client.storage
+    .from(BUCKET)
+    .upload(
+     storagePath,
+     new Blob([source],{type:"text/plain;charset=utf-8"}),
+     {
+      contentType:"text/plain",
+      upsert:false
+     }
+    );
+
+   if(uploadError) throw uploadError;
+
+   const {error:insertError} = await client
+    .from("lua_scripts")
+    .insert({
+     user_id:currentUser.id,
+     folder_id:folderId,
+     slug:slug,
+     title:title,
+     storage_path:storagePath
+    });
+
+   if(insertError){
+    await client.storage.from(BUCKET).remove([storagePath]);
+    throw insertError;
+   }
+
+   rawURL = RAW_ENDPOINT + slug;
+   loadString =
+    "loadstring(game:HttpGet("+
+    JSON.stringify(rawURL)+"))()";
+
+   message("status","Upload berhasil!");
+  }
 
   message("rawResult",rawURL);
   message("loadResult",loadString);
-  message("status","Upload berhasil!");
 
-  historyList.unshift({
-   name:filename,
-   url:rawURL
-  });
-
-  renderHistory();
+  resetEditor(false);
+  await loadAll();
 
  }catch(error){
   message("status","Gagal: "+error.message);
  }finally{
-  $("uploadBtn").disabled = false;
+  $("saveBtn").disabled = false;
  }
 }
 
-function renderHistory(){
- $("history").innerHTML = "";
+async function editScript(id){
+ const record = scripts.find(x=>x.id===id);
+ if(!record) return;
 
- historyList.forEach(item=>{
-  const div = document.createElement("div");
-  div.className = "history-item";
+ message("status","Mengambil isi script...");
 
-  const title = document.createElement("b");
-  title.textContent = item.name;
+ const {data,error} = await client.storage
+  .from(BUCKET)
+  .download(record.storage_path);
 
-  const url = document.createElement("div");
-  url.textContent = item.url;
-  url.style.color = "#70dc98";
+ if(error){
+  return message("status","Gagal membuka script: "+error.message);
+ }
 
-  div.append(title,url);
-  $("history").appendChild(div);
+ $("scriptCode").value = await data.text();
+ $("scriptTitle").value = record.title;
+ $("folderSelect").value = record.folder_id || "";
+
+ editingScript = record;
+
+ $("editorMode").textContent =
+  "Mode: Edit Raw • "+record.title;
+
+ $("saveBtn").textContent = "SAVE CHANGES";
+
+ rawURL = RAW_ENDPOINT + record.slug;
+ loadString =
+  "loadstring(game:HttpGet("+
+  JSON.stringify(rawURL)+"))()";
+
+ message("rawResult",rawURL);
+ message("loadResult",loadString);
+ message("status","Script siap diedit. URL tidak akan berubah.");
+
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function resetEditor(showMessage=true){
+ editingScript = null;
+
+ $("scriptTitle").value = "";
+ $("scriptCode").value = "";
+ $("folderSelect").value = "";
+
+ $("editorMode").textContent = "Mode: Script baru";
+ $("saveBtn").textContent = "UPLOAD SCRIPT";
+
+ if(showMessage){
+  message("status","Editor dibersihkan.");
+ }
+}
+
+/* RENAME / DELETE SCRIPT */
+
+async function renameScript(id){
+ const record = scripts.find(x=>x.id===id);
+ if(!record) return;
+
+ const newTitle = prompt("Nama script baru:",record.title);
+ if(newTitle === null) return;
+
+ if(!newTitle.trim()){
+  return alert("Nama script tidak boleh kosong.");
+ }
+
+ const {error} = await client
+  .from("lua_scripts")
+  .update({
+   title:newTitle.trim(),
+   updated_at:new Date().toISOString()
+  })
+  .eq("id",id);
+
+ if(error){
+  return message("status","Gagal rename: "+error.message);
+ }
+
+ await loadScripts();
+ message("status","Nama script berhasil diubah.");
+}
+
+async function deleteScript(id){
+ const record = scripts.find(x=>x.id===id);
+ if(!record) return;
+
+ if(!confirm("Hapus script "+record.title+"?")) return;
+
+ const {error:storageError} = await client.storage
+  .from(BUCKET)
+  .remove([record.storage_path]);
+
+ if(storageError){
+  return message("status","Gagal menghapus file: "+storageError.message);
+ }
+
+ const {error:dbError} = await client
+  .from("lua_scripts")
+  .delete()
+  .eq("id",id);
+
+ if(dbError){
+  return message("status","File terhapus, tetapi data gagal dihapus: "+dbError.message);
+ }
+
+ if(editingScript && editingScript.id===id){
+  resetEditor(false);
+ }
+
+ await loadAll();
+ message("status","Script berhasil dihapus.");
+}
+
+/* SCRIPT LIST */
+
+function renderScripts(){
+ const box = $("scriptList");
+ box.innerHTML = "";
+
+ const search = $("searchInput").value.toLowerCase();
+ const filter = $("filterFolder").value;
+
+ const results = scripts.filter(record=>{
+  const matchesName =
+   record.title.toLowerCase().includes(search);
+
+  const matchesFolder =
+   filter==="all" ||
+   (filter==="none" && !record.folder_id) ||
+   record.folder_id===filter;
+
+  return matchesName && matchesFolder;
+ });
+
+ if(!results.length){
+  box.textContent = "Tidak ada script ditemukan.";
+  return;
+ }
+
+ results.forEach(record=>{
+  const row = document.createElement("div");
+  row.className = "item";
+
+  const title = document.createElement("div");
+  title.className = "item-title";
+  title.textContent = "📄 "+record.title;
+
+  const folder = folders.find(x=>x.id===record.folder_id);
+
+  const meta = document.createElement("div");
+  meta.className = "item-meta";
+  meta.textContent =
+   "Folder: "+(folder ? folder.name : "Tanpa folder");
+
+  const slug = document.createElement("div");
+  slug.className = "item-meta";
+  slug.textContent = "ID: "+record.slug;
+
+  const actions = document.createElement("div");
+  actions.className = "actions";
+
+  const edit = document.createElement("button");
+  edit.textContent = "EDIT RAW";
+  edit.onclick = ()=>editScript(record.id);
+
+  const rename = document.createElement("button");
+  rename.className = "secondary";
+  rename.textContent = "RENAME";
+  rename.onclick = ()=>renameScript(record.id);
+
+  const del = document.createElement("button");
+  del.className = "danger";
+  del.textContent = "DELETE";
+  del.onclick = ()=>deleteScript(record.id);
+
+  const copy = document.createElement("button");
+  copy.className = "blue";
+  copy.textContent = "COPY URL";
+  copy.onclick = ()=>{
+   const url = RAW_ENDPOINT + record.slug;
+   copyText(url);
+  };
+
+  actions.append(edit,rename,del,copy);
+  row.append(title,meta,slug,actions);
+  box.append(row);
  });
 }
+
+/* COPY */
 
 async function copyText(value){
  if(!value){
@@ -356,23 +775,30 @@ function copyLoad(){
  copyText(loadString);
 }
 
-function clearAll(){
- $("script").value = "";
- $("filename").value = "script.lua";
- rawURL = "";
- loadString = "";
- message("rawResult","URL akan muncul setelah upload.");
- message("loadResult","Loadstring akan muncul di sini.");
- message("status","Input dan hasil dibersihkan.");
-}
+/* SESSION */
 
 client.auth.onAuthStateChange((event,session)=>{
  setApp(session?.user || null);
+
+ if(session?.user){
+  currentUser = session.user;
+  setTimeout(()=>loadAll(),0);
+ }
 });
 
 async function init(){
- const {data} = await client.auth.getSession();
+ const {data,error} = await client.auth.getSession();
+
+ if(error){
+  message("authStatus",error.message);
+  return;
+ }
+
  setApp(data.session?.user || null);
+
+ if(data.session?.user){
+  await loadAll();
+ }
 }
 
 init();
