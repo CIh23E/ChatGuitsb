@@ -38,10 +38,19 @@ header{
 }
 .brand{display:flex;align-items:center;gap:12px}
 .logo{
- width:44px;height:44px;border-radius:13px;
- display:grid;place-items:center;
- background:#26382b;color:var(--green2);
- font-size:21px;font-weight:800;border:1px solid #3a5140;
+ width:44px;
+ height:44px;
+ border-radius:13px;
+ overflow:hidden;
+ border:1px solid #3a5140;
+ flex-shrink:0;
+}
+
+.logo img{
+ width:100%;
+ height:100%;
+ object-fit:cover;
+ display:block;
 }
 h1{font-size:17px;margin:0;font-weight:800;letter-spacing:.4px}
 .sub{font-size:11px;color:var(--muted);margin-top:5px}
@@ -145,7 +154,9 @@ footer{text-align:center;padding:24px 5px;color:#687168;font-size:10px}
 
 <header>
  <div class="brand">
-  <div class="logo">L</div>
+  <div class="logo">
+ <img src="https://raw.githubusercontent.com/CIh23E/ChatGuitsb/911811839e800c0f1357df6b9e9dcf97d4ca638b/41cb9f51f4c27708bc9671a473012bc6.jpg" alt="Lua Raw Manager Logo">
+</div>
   <div>
    <h1>LUA RAW MANAGER</h1>
    <div class="sub">Your personal script workspace</div>
