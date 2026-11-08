@@ -3,120 +3,173 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#101713">
+<meta name="theme-color" content="#111411">
 <title>Lua Raw Manager V3</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box}
 :root{
- --bg:#0d1410;
- --panel:#151f19;
- --panel2:#1b2920;
- --line:#293c30;
- --green:#36c77b;
- --green2:#65e69e;
- --text:#edf7f0;
- --muted:#91a397;
- --red:#d65b5b;
+ --bg:#101210;
+ --surface:#181b18;
+ --surface2:#202520;
+ --surface3:#252c26;
+ --line:#303830;
+ --green:#78b88c;
+ --green2:#a2d4ad;
+ --text:#f0f2ef;
+ --muted:#929b92;
+ --red:#d77b7b;
 }
 body{
- margin:0;padding:18px 13px 35px;
- background:var(--bg);color:var(--text);
- font-family:Inter,Arial,sans-serif;
+ margin:0;
+ background:var(--bg);
+ color:var(--text);
+ font-family:Inter,system-ui,Arial,sans-serif;
+ font-size:14px;
 }
-.container{max-width:620px;margin:auto}
-header{padding:17px 5px 23px}
-.brand{display:flex;align-items:center;gap:10px}
+button,input,textarea,select{font:inherit}
+.container{max-width:760px;margin:auto;padding:0 16px 40px}
+header{
+ padding:25px 2px 22px;
+ display:flex;align-items:center;justify-content:space-between;
+ border-bottom:1px solid var(--line);
+ margin-bottom:22px;
+}
+.brand{display:flex;align-items:center;gap:12px}
 .logo{
- width:40px;height:40px;border-radius:13px;
+ width:44px;height:44px;border-radius:13px;
  display:grid;place-items:center;
- background:#1d3828;color:var(--green2);
- font-size:21px;font-weight:bold;
+ background:#26382b;color:var(--green2);
+ font-size:21px;font-weight:800;
+ border:1px solid #3a5140;
 }
-h1{font-size:19px;margin:0;font-weight:800;letter-spacing:.3px}
+h1{font-size:17px;margin:0;font-weight:800;letter-spacing:.4px}
 .sub{font-size:11px;color:var(--muted);margin-top:5px}
+.version{
+ font-size:10px;color:var(--green2);
+ background:#243329;padding:6px 9px;
+ border-radius:7px;border:1px solid #354a39;
+}
 .card{
- background:var(--panel);border:1px solid var(--line);
- border-radius:16px;padding:16px;margin-bottom:13px;
+ background:var(--surface);
+ border:1px solid var(--line);
+ border-radius:15px;
+ padding:17px;
+ margin-bottom:14px;
 }
 .card-head{
- display:flex;align-items:center;gap:9px;
- margin-bottom:15px;
+ display:flex;align-items:center;gap:11px;
+ margin-bottom:17px;
 }
 .card-icon{
- width:31px;height:31px;border-radius:10px;
- background:#20382a;display:grid;place-items:center;
- color:var(--green2);font-size:15px;
+ width:35px;height:35px;
+ display:grid;place-items:center;
+ border-radius:10px;
+ background:#26332a;color:var(--green2);
+ font-size:16px;
 }
-h3{font-size:13px;margin:0;font-weight:750}
+h3{font-size:13px;margin:0;font-weight:750;letter-spacing:.3px}
 .section-note{font-size:11px;color:var(--muted);margin-top:4px}
 input,textarea,select{
- width:100%;padding:13px;margin:5px 0;
- background:#0d1510;border:1px solid #304437;
- border-radius:10px;color:var(--text);
+ display:block;width:100%;
+ padding:13px 14px;margin:8px 0;
+ color:var(--text);
+ background:#111511;
+ border:1px solid #343d35;
+ border-radius:9px;
  outline:none;font-size:13px;
 }
-input:focus,textarea:focus,select:focus{
- border-color:var(--green);
-}
+input:focus,textarea:focus,select:focus{border-color:#719b7b}
+input::placeholder,textarea::placeholder{color:#687168}
 textarea{
- height:190px;resize:vertical;
- font-family:monospace;line-height:1.55;
+ height:210px;resize:vertical;
+ font-family:monospace;line-height:1.6;
 }
 button{
- border:0;border-radius:10px;padding:12px 14px;
- background:var(--green);color:#082014;
- font-weight:750;font-size:12px;
- cursor:pointer;transition:.18s;
+ border:1px solid transparent;
+ border-radius:9px;
+ padding:12px 15px;
+ background:#6fa981;color:#101b13;
+ font-size:12px;font-weight:750;
+ cursor:pointer;transition:background .15s,border .15s;
 }
-button:active{transform:scale(.97)}
-button:disabled{opacity:.45;cursor:not-allowed}
-button.secondary{background:#293a30;color:#e3f3e8}
-button.danger{background:#482b2b;color:#ffaaaa}
-button.blue{background:#243b50;color:#b6ddff}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
-.actions button{flex:1;min-width:90px}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.45}
+button.secondary{
+ background:#292f2a;color:#e4e9e4;
+ border-color:#3a423b;
+}
+button.danger{
+ background:#392626;color:#e8aaaa;
+ border-color:#563737;
+}
+button.blue{
+ background:#27333b;color:#b9d7e8;
+ border-color:#3b4c57;
+}
+button:hover{filter:brightness(1.1)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.actions button{flex:1;min-width:95px}
 .status{
- padding:12px;border-radius:10px;
- background:#101c14;color:#a8e9bd;
- font-size:12px;word-break:break-word;margin-top:11px;
- border:1px solid #243a2b;
+ padding:12px 13px;border-radius:9px;
+ background:#202b22;color:#b6d9bd;
+ font-size:12px;line-height:1.5;
+ margin-top:12px;border:1px solid #354638;
+ word-break:break-word;
 }
 .result{
- word-break:break-all;background:#0d1510;
- padding:13px;border-radius:10px;
+ background:#111511;
+ border:1px solid #343d35;
+ border-radius:9px;
+ padding:14px;margin:10px 0;
  font-size:12px;color:var(--green2);
- margin:9px 0;border:1px solid #293d30;
+ word-break:break-all;line-height:1.6;
 }
-.small{font-size:11px;color:var(--muted);line-height:1.5}
+.small{font-size:11px;color:var(--muted);line-height:1.6}
 .hidden{display:none!important}
 .item{
  border-top:1px solid var(--line);
- padding:13px 0;font-size:12px;word-break:break-word;
+ padding:14px 0;
+ font-size:12px;word-break:break-word;
 }
-.item-title{font-weight:750;color:#e2f5e8;font-size:13px}
+.item-title{font-weight:750;color:#edf1ed;font-size:13px}
 .item-meta{color:var(--muted);margin:6px 0;font-size:11px}
 .tag{
- display:inline-block;background:#203b2a;color:#8ce9ac;
+ display:inline-block;background:#29382c;color:#a6d8b1;
+ border:1px solid #3c5140;
  border-radius:6px;padding:5px 8px;font-size:10px;
 }
-hr{border:0;border-top:1px solid var(--line);margin:15px 0}
+hr{border:0;border-top:1px solid var(--line);margin:17px 0}
 .file-zone{
- border:1px dashed #477458;background:#112019;
- border-radius:13px;padding:20px 12px;
- text-align:center;margin:10px 0;
+ border:1px dashed #526c56;
+ background:#171e18;
+ border-radius:12px;padding:22px 14px;
+ text-align:center;margin:12px 0;
 }
 .file-symbol{
- width:46px;height:46px;border-radius:14px;
- background:#20432e;color:#83e9a9;
+ width:44px;height:44px;border-radius:12px;
+ background:#293b2d;color:var(--green2);
  display:grid;place-items:center;
- margin:0 auto 10px;font-size:22px;
+ margin:0 auto 12px;font-size:21px;
 }
-.file-name{font-size:12px;color:var(--green2);margin-top:9px;word-break:break-all}
+.file-name{font-size:12px;color:var(--green2);margin-top:10px;word-break:break-all}
 .file-button{width:100%;margin-top:12px}
-.file-hint{font-size:10px;color:var(--muted);margin-top:8px}
-footer{text-align:center;padding:20px 5px;color:#718278;font-size:10px}
+.file-hint{font-size:10px;color:var(--muted);margin-top:9px}
+.section-label{
+ color:var(--muted);font-size:10px;
+ text-transform:uppercase;letter-spacing:1px;
+ margin:18px 0 8px;
+}
+footer{
+ text-align:center;padding:24px 5px;
+ color:#687168;font-size:10px;
+}
+@media(min-width:600px){
+ .container{padding-left:22px;padding-right:22px}
+ .card{padding:20px}
+ header{padding-top:30px}
+}
 </style>
 </head>
 
@@ -128,9 +181,10 @@ footer{text-align:center;padding:20px 5px;color:#718278;font-size:10px}
   <div class="logo">L</div>
   <div>
    <h1>LUA RAW MANAGER</h1>
-   <div class="sub">Manage your Lua scripts • V2</div>
+   <div class="sub">Your personal script workspace</div>
   </div>
  </div>
+ <div class="version">VERSION 3.0</div>
 </header>
 
 <!-- AUTH -->
@@ -138,7 +192,7 @@ footer{text-align:center;padding:20px 5px;color:#718278;font-size:10px}
  <div class="card-head">
   <div class="card-icon">◈</div>
   <div>
-   <h3>ACCOUNT</h3>
+   <h3>WELCOME BACK</h3>
    <div class="section-note">Login atau buat akun baru</div>
   </div>
  </div>
@@ -157,12 +211,12 @@ footer{text-align:center;padding:20px 5px;color:#718278;font-size:10px}
 <div class="card">
  <div class="card-head">
   <div class="card-icon">◉</div>
-  <div>
+  <div style="flex:1">
    <h3>ACCOUNT</h3>
    <div class="section-note" id="userInfo"></div>
   </div>
+  <button class="secondary" onclick="logout()">Logout</button>
  </div>
- <button class="secondary" onclick="logout()">Logout</button>
 </div>
 
 <!-- FOLDER -->
@@ -171,11 +225,14 @@ footer{text-align:center;padding:20px 5px;color:#718278;font-size:10px}
   <div class="card-icon">▣</div>
   <div>
    <h3>FOLDER MANAGER</h3>
-   <div class="section-note">Kelola folder script milikmu</div>
+   <div class="section-note">Organize your scripts</div>
   </div>
  </div>
+
+ <div class="section-label">Create new folder</div>
  <input id="folderName" placeholder="Nama folder baru">
  <button onclick="createFolder()" style="width:100%">+ Buat Folder</button>
+
  <hr>
  <div id="folderList" class="small">Memuat folder...</div>
 </div>
@@ -190,24 +247,21 @@ footer{text-align:center;padding:20px 5px;color:#718278;font-size:10px}
   </div>
  </div>
 
+ <div class="section-label">Script information</div>
  <input id="scriptTitle" placeholder="Nama script">
 
  <select id="folderSelect">
   <option value="">Tanpa folder</option>
  </select>
 
- <!-- FILE PICKER -->
+ <div class="section-label">Import file</div>
  <div class="file-zone">
   <div class="file-symbol">↑</div>
-  <h3>Pilih File Lua</h3>
-  <div class="section-note">Ambil file langsung dari penyimpanan perangkat</div>
+  <h3>Import Lua File</h3>
+  <div class="section-note">Pilih file dari penyimpanan perangkat</div>
 
-  <input
-   type="file"
-   id="filePicker"
-   accept=".lua,.txt,.luau,text/plain"
-   hidden
-  >
+  <input type="file" id="filePicker"
+   accept=".lua,.txt,.luau,text/plain" hidden>
 
   <button class="file-button" onclick="openFilePicker()">
    Pilih File
@@ -217,12 +271,10 @@ footer{text-align:center;padding:20px 5px;color:#718278;font-size:10px}
    Belum ada file dipilih
   </div>
 
-  <div class="file-hint">
-   Format yang didukung: .lua, .luau, .txt
-  </div>
+  <div class="file-hint">Format: .lua, .luau, .txt</div>
  </div>
 
- <div class="small">Atau tempel kode Lua secara manual:</div>
+ <div class="section-label">Source code</div>
  <textarea id="scriptCode"
   placeholder="Paste kode Lua milikmu di sini..."></textarea>
 
@@ -243,24 +295,12 @@ footer{text-align:center;padding:20px 5px;color:#718278;font-size:10px}
    <div class="section-note">Alamat script yang sudah tersimpan</div>
   </div>
  </div>
- <div class="result" id="rawResult">URL muncul setelah script disimpan.</div>
- <button class="secondary" style="width:100%" onclick="copyRaw()">Copy Raw URL</button>
-</div>
-
-<!-- LOADSTRING -->
-<div class="card">
- <div class="card-head">
-  <div class="card-icon">⌘</div>
-  <div>
-   <h3>LOADSTRING</h3>
-   <div class="section-note">Salin pemanggil script</div>
-  </div>
+ <div class="result" id="rawResult">
+  URL muncul setelah script disimpan.
  </div>
- <div class="result" id="loadResult">Loadstring muncul setelah script disimpan.</div>
- <button style="width:100%" onclick="copyLoad()">Copy Loadstring</button>
- <div class="small" style="margin-top:10px">
-  Catatan: Loadstring bukan API standar Roblox Studio. Gunakan hanya pada lingkungan yang kamu miliki atau punya izin untuk menguji.
- </div>
+ <button class="secondary" style="width:100%" onclick="copyRaw()">
+  Copy Raw URL
+ </button>
 </div>
 
 <!-- SCRIPT MANAGER -->
@@ -269,20 +309,26 @@ footer{text-align:center;padding:20px 5px;color:#718278;font-size:10px}
   <div class="card-icon">▤</div>
   <div>
    <h3>SCRIPT MANAGER</h3>
-   <div class="section-note">Cari dan kelola script tersimpan</div>
+   <div class="section-note">Manage your saved scripts</div>
   </div>
  </div>
- <input id="searchInput" placeholder="Cari nama script..." oninput="renderScripts()">
+
+ <input id="searchInput" placeholder="Cari nama script..."
+  oninput="renderScripts()">
+
  <select id="filterFolder" onchange="renderScripts()">
   <option value="all">Semua folder</option>
   <option value="none">Tanpa folder</option>
  </select>
+
  <div id="scriptList" class="small">Memuat script...</div>
 </div>
 
 </div>
 
-<footer>LUA RAW MANAGER V2 · POWERED BY SUPABASE</footer>
+<footer>
+ LUA RAW MANAGER V3 · POWERED BY SUPABASE
+</footer>
 </div>
 
 <script>
@@ -305,7 +351,6 @@ let folders = [];
 let scripts = [];
 let editingScript = null;
 let rawURL = "";
-let loadString = "";
 
 const $ = id => document.getElementById(id);
 
@@ -335,9 +380,7 @@ $("filePicker").addEventListener("change",async function(){
  const file = this.files && this.files[0];
  if(!file) return;
 
- const allowed = /\.(lua|luau|txt)$/i.test(file.name);
-
- if(!allowed){
+ if(!/\.(lua|luau|txt)$/i.test(file.name)){
   message("status","Format file tidak didukung.");
   this.value = "";
   return;
@@ -425,6 +468,7 @@ async function logout(){
  folders = [];
  scripts = [];
  editingScript = null;
+ rawURL = "";
 }
 
 /* LOAD DATA */
@@ -433,6 +477,7 @@ async function loadAll(){
  if(!currentUser) return;
  await loadFolders();
  await loadScripts();
+ renderFolders();
 }
 
 async function loadFolders(){
@@ -464,6 +509,7 @@ async function loadScripts(){
 
  scripts = data || [];
  renderScripts();
+ renderFolders();
 }
 
 /* FOLDER */
@@ -546,7 +592,8 @@ function renderFolders(){
 
   const count = document.createElement("div");
   count.className = "item-meta";
-  count.textContent = scripts.filter(x=>x.folder_id===folder.id).length+" script";
+  count.textContent =
+   scripts.filter(x=>x.folder_id===folder.id).length+" script";
 
   const actions = document.createElement("div");
   actions.className = "actions";
@@ -598,7 +645,6 @@ async function saveScript(){
  let title = $("scriptTitle").value.trim();
 
  if(!source.trim()) return message("status","Kode Lua masih kosong.");
-
  if(!title) title = "script.lua";
 
  const folderId = $("folderSelect").value || null;
@@ -630,8 +676,6 @@ async function saveScript(){
    if(updateError) throw updateError;
 
    rawURL = RAW_ENDPOINT + editingScript.slug;
-   loadString = "loadstring(game:HttpGet("+JSON.stringify(rawURL)+"))()";
-
    message("status","Script berhasil diedit! URL tetap sama.");
   }else{
    message("status","Mengupload script baru...");
@@ -665,14 +709,10 @@ async function saveScript(){
    }
 
    rawURL = RAW_ENDPOINT + slug;
-   loadString = "loadstring(game:HttpGet("+JSON.stringify(rawURL)+"))()";
-
    message("status","Upload berhasil!");
   }
 
   message("rawResult",rawURL);
-  message("loadResult",loadString);
-
   resetEditor(false);
   await loadAll();
 
@@ -702,14 +742,11 @@ async function editScript(id){
  $("selectedFile").textContent = "Script dari penyimpanan Supabase";
 
  editingScript = record;
- $("editorMode").textContent = "Mode: Edit Raw • "+record.title;
+ $("editorMode").textContent = "Mode: Edit • "+record.title;
  $("saveBtn").textContent = "Save Changes";
 
  rawURL = RAW_ENDPOINT + record.slug;
- loadString = "loadstring(game:HttpGet("+JSON.stringify(rawURL)+"))()";
-
  message("rawResult",rawURL);
- message("loadResult",loadString);
  message("status","Script siap diedit. URL tidak akan berubah.");
 
  window.scrollTo({top:0,behavior:"smooth"});
@@ -826,7 +863,7 @@ function renderScripts(){
   actions.className = "actions";
 
   const edit = document.createElement("button");
-  edit.textContent = "Edit Raw";
+  edit.textContent = "Edit";
   edit.onclick = ()=>editScript(record.id);
 
   const rename = document.createElement("button");
@@ -864,7 +901,6 @@ async function copyText(value){
 }
 
 function copyRaw(){copyText(rawURL);}
-function copyLoad(){copyText(loadString);}
 
 /* SESSION */
 
